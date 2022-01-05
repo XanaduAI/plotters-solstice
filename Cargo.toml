@@ -1,0 +1,15 @@
+[package]
+name = "plotters-solstice"
+version = "0.1.0"
+description = "A web and opengl backend for Plotters using Solstice."
+repository = "https://github.com/TannerRogalsky/luabins"
+homepage = "https://github.com/TannerRogalsky/luabins"
+edition = "2021"
+license-file = "LICENSE"
+readme = "README.md"
+
+[dependencies]
+plotters-backend = "0.3"
+solstice-2d = "^0.2.14"
+log = "0.4"
+web-sys = { version = "0.3", features = ["WebGlRenderingContext"] }
