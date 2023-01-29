@@ -30,6 +30,11 @@ impl SolsticeBackend {
             draw_list: Default::default(),
         })
     }
+
+    pub fn resize(&mut self, width: f32, height: f32) {
+        self.ctx.set_viewport(0, 0, width as _, height as _);
+        self.gfx.set_width_height(width, height);
+    }
 }
 
 fn color_into(color: BackendColor) -> solstice_2d::Color {
