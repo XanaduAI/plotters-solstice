@@ -17,11 +17,21 @@ impl SolsticeBackend {
         font_data: solstice_2d::text::FontVec,
         width: f32,
         height: f32,
+        line_buffer_capacity: usize,
+        mesh_buffer_capacity: usize,
     ) -> Result<Self, solstice_2d::GraphicsError> {
         let ctx = solstice_2d::solstice::glow::Context::from_webgl1_context(webgl1);
         let mut ctx = solstice_2d::solstice::Context::new(ctx);
         ctx.set_viewport(0, 0, width as _, height as _);
-        let mut gfx = solstice_2d::Graphics::new(&mut ctx, width, height)?;
+        let mut gfx = solstice_2d::Graphics::with_config(
+            &mut ctx,
+            &solstice_2d::Config {
+                width,
+                height,
+                line_capacity: line_buffer_capacity,
+                mesh_capacity: mesh_buffer_capacity,
+            },
+        )?;
         let font_id = gfx.add_font(font_data);
         Ok(Self {
             ctx,
