@@ -82,6 +82,11 @@ impl DrawingBackend for SolsticeBackend {
         point: BackendCoord,
         color: BackendColor,
     ) -> Result<(), DrawingErrorKind<Self::ErrorType>> {
+        let size = self.get_size();
+        if point.0 < 0 || point.1 < 0 || point.0 as u32 >= size.0 || point.1 as u32 >= size.1 {
+            return Ok(());
+        }
+
         let (x, y) = point;
         self.draw_list.draw_with_color(
             solstice_2d::Rectangle {
@@ -187,6 +192,29 @@ impl DrawingBackend for SolsticeBackend {
         style: &TStyle,
         (x, y): BackendCoord,
     ) -> Result<(), DrawingErrorKind<Self::ErrorType>> {
+        let color = style.color();
+        if color.alpha == 0.0 {
+            return Ok(());
+        }
+
+        let layout = style
+            .layout_box(text)
+            .map_err(|e| DrawingErrorKind::FontError(Box::new(e)))?;
+        let ((min_x, min_y), (max_x, max_y)) = layout;
+        let width = (max_x - min_x) as i32;
+        let height = (max_y - min_y) as i32;
+        let dx = match style.anchor().h_pos {
+            plotters_backend::text_anchor::HPos::Left => 0,
+            plotters_backend::text_anchor::HPos::Right => -width,
+            plotters_backend::text_anchor::HPos::Center => -width / 2,
+        };
+        let dy = match style.anchor().v_pos {
+            plotters_backend::text_anchor::VPos::Top => 0,
+            plotters_backend::text_anchor::VPos::Center => -height / 2,
+            plotters_backend::text_anchor::VPos::Bottom => -height,
+        };
+        let trans = style.transform();
+        let (x, y) = trans.transform(x + dx - min_x, y + dy - min_y);
         let scale = style.size() as f32;
         let bounds = solstice_2d::Rectangle {
             x: x as f32,
